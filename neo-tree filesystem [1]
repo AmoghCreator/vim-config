@@ -1,0 +1,8 @@
+  ~/.config/nvim
+    .git
+    after                             
+    lua
+    pack
+    plugin
+    init.lua
+   * neo-tree filesystem [1]           

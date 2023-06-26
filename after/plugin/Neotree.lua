@@ -1,184 +1,78 @@
--- This file can be loaded by calling `lua require('plugins')` from your init.vim
+vim.keymap.set("n" , "<leader>e" , ":Neotree<CR>" , { noremap = true, silent = true })
 
--- Only required if you have packer configured as `opt`
-vim.cmd [[packadd packer.nvim]]
-
-return require('packer').startup(function(use)
-  -- Packer can manage itself
-  use 'wbthomason/packer.nvim'
-  use({
-	  'nvim-telescope/telescope.nvim', tag = '0.1.1',
-	  -- or                            , branch = '0.1.x',
-	  requires = { {'nvim-lua/plenary.nvim'} }
-  })
-  use('nvim-treesitter/nvim-treesitter', {run = ':TSUpdate'})
-  use('nvim-lua/plenary.nvim')
-  use('ThePrimeagen/harpoon')
-  use 'mbbill/undotree'
-  use 'tpope/vim-fugitive'
-  use {
-	  'VonHeikemen/lsp-zero.nvim',
-	  branch = 'v2.x',
-	  requires = {
-		  -- LSP Support
-		  {'neovim/nvim-lspconfig'},             -- Required
-		  {                                      -- Optional
-		  'williamboman/mason.nvim',
-		  run = function()
-			  pcall(vim.cmd, 'MasonUpdate')
-		  end,
-	  },
-	  {'williamboman/mason-lspconfig.nvim'}, -- Optional
-
-	  -- Autocompletion
-	  {'hrsh7th/nvim-cmp'},     -- Required
-	  {'hrsh7th/cmp-nvim-lsp'}, -- Required
-	  {'L3MON4D3/LuaSnip'},     -- Required
-  	}
-   }
-use('neovim/nvim-lspconfig')
-use('jose-elias-alvarez/null-ls.nvim')
-use('MunifTanjim/prettier.nvim')
-use("nikolvs/vim-sunbather")
-use('preservim/nerdtree')
-use {
-    's1n7ax/nvim-terminal',
-    config = function()
-        vim.o.hidden = true
-        require('nvim-terminal').setup()
-    end,
-}
-use 'voldikss/vim-floaterm'
-use {
-  "startup-nvim/startup.nvim",
-  requires = {"nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim"},
-  config = function()
-    require"startup".setup({
-    -- every line should be same width without escaped \
-    header = {
-        type = "text",
-        oldfiles_directory = false,
-        align = "center",
-        fold_section = false,
-        title = "Header",
-        margin = 5,
-        content = {
-            "       ________          _____  _____  _____       _________               ",
-            
-            "      //      \\\\        //   \\\\//   \\\\//   \\\\     //\\      \\\\/   \\\\  ______",
-            "     //        \\\\      //     ||     ||     ||   //  \\____/ \\\\   // //     ",
-            "    //          \\\\    //      ||     ||     ||  //           \\\\ //  \\\\____ ",
-            "    //\\\\         //   //       ||     ||     || //\\\\          //           \\\\",
-	    " \\_//  \\\\_______//\\\\_//        ||     ||     ||//  \\\\________//       _____//"
+require("neo-tree").setup({
+        close_if_last_window = false, -- Close Neo-tree if it is the last window left in the tab
+        popup_border_style = "rounded",
+        enable_git_status = true,
+        enable_diagnostics = true,
+        open_files_do_not_replace_types = { "terminal", "trouble", "qf" }, -- when opening files, do not use windows containing these filetypes or buftypes
+        sort_case_insensitive = false, -- used when sorting files and directories in the tree
+        sort_function = nil , -- use a custom function for sorting files and directories in the tree 
+        -- sort_function = function (a,b)
+        --       if a.type == b.type then
+        --           return a.path > b.path
+        --       else
+        --           return a.type > b.type
+        --       end
+        --   end , -- this sorts files and directories descendantly
+        default_component_configs = {
+          container = {
+            enable_character_fade = true
+          },
+          indent = {
+            indent_size = 2,
+            padding = 1, -- extra padding on left hand side
+            -- indent guides
+            with_markers = true,
+            indent_marker = "│",
+            last_indent_marker = "└",
+            highlight = "NeoTreeIndentMarker",
+            -- expander config, needed for nesting files
+            with_expanders = nil, -- if nil and file nesting is enabled, will enable expanders
+            expander_collapsed = "",
+            expander_expanded = "",
+            expander_highlight = "NeoTreeExpander",
+          },
+          icon = {
+            folder_closed = "",
+            folder_open = "",
+            folder_empty = "ﰊ",
+            -- The next two settings are only a fallback, if you use nvim-web-devicons and configure default icons there
+            -- then these will never be used.
+            default = "*",
+            highlight = "NeoTreeFileIcon"
+          },
+          modified = {
+            symbol = "[+]",
+            highlight = "NeoTreeModified",
+          },
+          name = {
+            trailing_slash = false,
+            use_git_status_colors = true,
+            highlight = "NeoTreeFileName",
+          },
+          git_status = {
+            symbols = {
+              -- Change type
+              added     = "", -- or "✚", but this is redundant info if you use git_status_colors on the name
+              modified  = "", -- or "", but this is redundant info if you use git_status_colors on the name
+              deleted   = "✖",-- this can only be used in the git_status source
+              renamed   = "",-- this can only be used in the git_status source
+              -- Status type
+              untracked = "",
+              ignored   = "",
+              unstaged  = "",
+              staged    = "",
+              conflict  = "",
+            }
+          },
         },
-        highlight = "Statement",
-        default_color = "",
-        oldfiles_amount = 0,
-    },
-    -- name which will be displayed and command
-    body = {
-        type = "mapping",
-        oldfiles_directory = false,
-        align = "center",
-        fold_section = false,
-        title = "Basic Commands",
-        margin = 5,
-        content = {
-            { " Find File", "Telescope find_files", "<leader>ff" },
-            { " Find Word", "Telescope live_grep", "<leader>lg" },
-            { " Recent Files", "Telescope oldfiles", "<leader>of" },
-            { " File Browser", "Telescope file_browser", "<leader>fb" },
-            { " Colorschemes", "Telescope colorscheme", "<leader>cs" },
-            { " New File", "lua require'startup'.new_file()", "<leader>nf" },
-        },
-        highlight = "String",
-        default_color = "",
-        oldfiles_amount = 0,
-    },
-    footer = {
-        type = "text",
-        oldfiles_directory = false,
-        align = "center",
-        fold_section = false,
-        title = "Footer",
-        margin = 5,
-        content = { "startup.nvim" },
-        highlight = "Number",
-        default_color = "",
-        oldfiles_amount = 0,
-    },
-
-    options = {
-        mapping_keys = true,
-        cursor_column = 0.5,
-        empty_lines_between_mappings = true,
-        disable_statuslines = true,
-        paddings = { 1, 3, 3, 0 },
-    },
-    mappings = {
-        execute_command = "<CR>",
-        open_file = "o",
-        open_file_split = "<c-o>",
-        open_section = "<TAB>",
-        open_help = "?",
-    },
-    colors = {
-        background = "#1f2227",
-        folded_section = "#56b6c2",
-    },
-    parts = { "header", "body", "footer" },
-})
-  end
-}
-
-use {
-    "nvim-neo-tree/neo-tree.nvim",
-    branch = "v2.x",
-    requires = { 
-      "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
-      "MunifTanjim/nui.nvim",
-    },default_component_configs = {
-    icon = {
-      folder_empty = "󰜌",
-      folder_empty_open = "󰜌",
-    },
-    git_status = {
-      symbols = {
-        renamed   = "󰁕",
-        unstaged  = "󰄱",
-      },
-    },
-  },
-  document_symbols = {
-    kinds = {
-      File = { icon = "󰈙", hl = "Tag" },
-      Namespace = { icon = "󰌗", hl = "Include" },
-      Package = { icon = "󰏖", hl = "Label" },
-      Class = { icon = "󰌗", hl = "Include" },
-      Property = { icon = "󰆧", hl = "@property" },
-      Enum = { icon = "󰒻", hl = "@number" },
-      Function = { icon = "󰊕", hl = "Function" },
-      String = { icon = "󰀬", hl = "String" },
-      Number = { icon = "󰎠", hl = "Number" },
-      Array = { icon = "󰅪", hl = "Type" },
-      Object = { icon = "󰅩", hl = "Type" },
-      Key = { icon = "󰌋", hl = "" },
-      Struct = { icon = "󰌗", hl = "Type" },
-      Operator = { icon = "󰆕", hl = "Operator" },
-      TypeParameter = { icon = "󰊄", hl = "Type" },
-      StaticMethod = { icon = '󰠄 ', hl = 'Function' },
-    }
-  },
-  -- Add this section only if you've configured source selector.
-  source_selector = {
-    sources = {
-      { source = "filesystem", display_name = " 󰉓 Files " },
-      { source = "git_status", display_name = " 󰊢 Git " },
-    },
-  },
- window = {
-          position = "right",
+        -- A list of functions, each representing a global custom command
+        -- that will be available in all sources (if not overridden in `opts[source_name].commands`)
+        -- see `:h neo-tree-global-custom-commands`
+        commands = {},
+        window = {
+          position = "left",
           width = 40,
           mapping_options = {
             noremap = true,
@@ -322,7 +216,5 @@ use {
             }
           }
         }
-}
-
-end)
+      })
 
